@@ -51,7 +51,7 @@ jobs:
       
     # 步骤8：运行测试项目，不构建项目，设置日志级别为normal
     - name: Test project
-      run: dotnet test ./${{ env.PROJECT_NAME }}/GrpcStreamTestDemo.sln --no-build --verbosity normal
+      run: dotnet test ./GrpcStreamTestDemo.sln --no-build --verbosity normal
     # 步骤9：发布项目，配置为Release
     - name: Publish project
       if: success() # 仅在构建和测试成功时运行
