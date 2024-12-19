@@ -26,7 +26,7 @@ jobs:
       uses: microsoft/setup-msbuild@v1  
     # 步骤3：恢复.netframework4.8项目依赖项
     - name: Restore dependencies for .netframework4.8
-      run: dotnet restore ./${{env.PROJECT_NAME}}/GrpcStreamTestDemo.sln
+      run: dotnet restore ./GrpcStreamTestDemo.sln
     # 步骤4：构建.netframework4.8项目，不进行恢复操作，配置为Release 
     - name: Build .net framework 4.8.1 Project 
       shell: pwsh
