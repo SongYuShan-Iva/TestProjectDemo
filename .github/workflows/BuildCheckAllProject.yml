@@ -30,7 +30,7 @@ jobs:
       with: 
         dotnet-version: '8.0.x'  
 
-    # 步骤6：恢复.netframework4.8项目依赖项
+    # 步骤4：恢复.netframework4.8项目依赖项
     - name: Restore dependencies for .netframework4.8
       run: dotnet restore ${{env.Cilent_Path}} 
     # 步骤5：构建.netframework4.8项目，不进行恢复操作，配置为Release 
@@ -43,20 +43,20 @@ jobs:
     # 步骤6：恢复.net8项目依赖项
     - name: Restore dependencies for .net8
       run: dotnet restore ${{env.Service_Path}} 
-    # 步骤4：构建.net8项目，不进行恢复操作，配置为Release 
+    # 步骤7：构建.net8项目，不进行恢复操作，配置为Release 
     - name: Build .net8
       run: dotnet build ${{ env.Service_Path }} --no-restore --configuration Release -f net8.0 
     
      
       
-    # 步骤7：运行测试项目，不构建项目，设置日志级别为normal
+    # 步骤8：运行测试项目，不构建项目，设置日志级别为normal
     - name: Test project
-      run: dotnet test ${{ env.PROJECT_NAME }}/GrpcStreamTestDemo.sln --no-build --verbosity normal
-    # 步骤8：发布项目，配置为Release
+      run: dotnet test ./${{ env.PROJECT_NAME }}/GrpcStreamTestDemo.sln --no-build --verbosity normal
+    # 步骤9：发布项目，配置为Release
     - name: Publish project
       if: success() # 仅在构建和测试成功时运行
       run: dotnet publish ${{ env.PROJECT_NAME }} --configuration Release --output ./publish
-    # 步骤9：上传构建产物
+    # 步骤10：上传构建产物
     - name: Upload artifact
       if: success() # 仅在构建和测试成功时运行
       uses: actions/upload-artifact@v3
