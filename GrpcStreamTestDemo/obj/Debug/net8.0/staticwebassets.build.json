@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "8vOJzVbYvl3MjCIPP8MAHFF+L3Nvxv//hRQKh4zR3LU=",
+  "Source": "GrpcStreamTestDemo",
+  "BasePath": "_content/GrpcStreamTestDemo",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
