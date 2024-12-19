@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+option csharp_namespace = "GrpcStreamTestDemo";
+
+package greet;
+
+// The greeting service definition.
+service Greeter {
+  // Sends a greeting
+  rpc SayHello (HelloRequest) returns (HelloReply);
+    // 普通 RPC
+  rpc SimplePing(PingRequest) returns (PingReply);
+
+  // 客户端流式 RPC
+  rpc ClientStreamPing(stream PingRequest) returns (PingReply);
+
+  // 服务器端流式 RPC
+  rpc ServerStreamPing(PingRequest) returns (stream PingReply);
+
+  // 双向流式 RPC
+  rpc BothStreamPing(stream PingRequest) returns (stream PingReply);
+
+}
+
+// The request message containing the user's name.
+message HelloRequest {
+  string name = 1;
+}
+
+// The response message containing the greetings.
+message HelloReply {
+  string message = 1;
+}
+
+message PingRequest {
+  string messageId = 1;
+}
+
+message PingReply {
+  string message = 1;
+}

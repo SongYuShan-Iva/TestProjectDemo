@@ -1,0 +1,116 @@
+name: Build and Test .NET 8 Project
+
+# 触发条件，当代码被推送到main或dev分支，或者有针对这些分支的Pull Request时触发
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main, dev ]
+
+# 环境变量，指定服务的路径
+env:
+  # 项目名称
+  PROJECT_NAME: 'GrpcStreamTestDemo'
+  # 项目文件路径，相对于仓库根目录的路径
+  Service_Path: './GrpcStreamTestDemo'
+
+jobs:
+  build-and-test:
+    # 定义作业名称
+    name: Build and Test .NET 8 Project
+    # 指定运行作业的操作系统环境
+    runs-on: windows-2022 #runs-on: ubuntu-latest # 使用最新的Ubuntu环境
+    timeout-minutes: 2 # 设置作业的最大执行时间为2分钟
+    steps:
+    # 步骤1：检出代码库
+    - name: Checkout the repository
+      uses: actions/checkout@v3
+      # 可以选择指定检出的分支，这里默认检出触发事件的分支
+      # with:
+      #   ref: dev
+    # 步骤2：设置SDK
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x' # 设置为你使用的.NET版本
+    # 步骤3：恢复项目依赖项
+    - name: Restore dependencies
+      run: dotnet restore ${{ env.Service_Path }}
+
+    # 步骤4：构建项目，不进行恢复操作，配置为Release，目标框架为net8.0
+    - name: Build project (Release)
+      run: dotnet build ${{ env.Service_Path }} --no-restore -c Release -f net8.0
+
+    # # 步骤4：再次构建项目，不进行恢复操作，使用默认配置
+    # - name: Build project (Debug)
+    #   run: dotnet build ./${{ env.Service_Path }} --no-restore
+
+    # 步骤5：运行测试项目，不构建项目，设置日志级别为normal
+    - name: Test project
+      run: dotnet test ${{ env.Service_Path }} --no-build --verbosity normal
+    # 步骤6：发布项目，配置为Release
+    - name: Publish project
+      if: success() # 仅在构建和测试成功时运行
+      run: dotnet publish ${{ env.Service_Path }} --configuration Release --output ./publish
+    # 步骤7：上传构建产物
+    - name: Upload artifact
+      if: success() # 仅在构建和测试成功时运行
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ env.PROJECT_NAME }}
+        path: ./publish
+    # 可以添加更多的步骤，例如发布构建产物、上传测试覆盖率报告等
+    # - name: Publish artifact
+    #   if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    #   uses: actions/upload-artifact@v3
+    #   with:
+    #     name: GrpcStreamTestDemo
+    #     path: ./GrpcStreamTestDemo/bin/Release/*.dll
+    # - name: Create  pull request
+      # uses: actions/github-script@v6
+      # with:
+        # script: |
+          # const github = require('@actions/github');
+          # const { GITHUB_TOKEN } = process.env;
+          # const repo = github.context.repo;
+          # const owner = repo.owner;
+          # const repoName = repo.repo;
+
+          # // 获取当前分支的最新提交的 SHA
+          # const response = await github.rest.repos.getCommit({
+          #   owner,
+          #   repo: repoName,
+          #   ref: 'dev'
+          # });
+          # const headSha = response.data.sha;
+
+          # // 获取 main 分支的最新提交的 SHA
+          # const mainResponse = await github.rest.repos.getCommit({
+          #   owner,
+          #   repo: repoName,
+          #   ref: 'main'
+          # });
+          # const baseSha = mainResponse.data.sha;
+
+          # // 创建 PR
+          # await github.rest.pulls.create({
+          #   owner,
+          #   repo: repoName,
+          #   title: 'Auto merge from dev to main',
+          #   head: 'dev',
+          #   base: 'main',
+          #   body: 'This is an automatically created pull request to merge changes from dev to main.'
+          # });
+
+          # // 获取新创建的 PR 的编号
+          # const prResponse = await github.rest.search.issuesAndPullRequests({
+          #   q: `repo:${repoName}+type:pr+head:dev+base:main`
+          # });
+          # const prNumber = prResponse.data.items[0].number;
+
+          # // 合并 PR
+          # await github.rest.pulls.merge({
+          #   owner,
+          #   repo: repoName,
+          #   pull_number: prNumber
+          # });
